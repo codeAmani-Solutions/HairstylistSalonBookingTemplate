@@ -69,6 +69,21 @@
     ======================================================== 
 -->
 <script>
+    // --- 0. ANTI-FLICKER INITIAL THEME SET (Before DOMContentLoaded) ---
+    // Read saved theme or system preference to apply 'dark' class immediately
+    (function() {
+        const savedTheme = localStorage.getItem('theme');
+        const systemPreference = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        const initialMode = savedTheme || systemPreference;
+
+        if (initialMode === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    })();
+
+
     // --- 1. SITE CONFIGURATION OBJECT ---
     // Define all primary content, links, and styling variables here for easy customization.
     
@@ -76,6 +91,7 @@
     // so it can be used within the CONFIG object definition without self-reference.
     const CONFIG_PRIMARY_COLOR_HEX = "d8a4b4"; 
 
+    // Define CONFIG object structure without self-referencing properties
     const CONFIG = {
         brand: {
             name: "The Gilded Tress",
@@ -90,11 +106,8 @@
             { id: 3, name: "Deep Conditioning Treatment", price: 45, duration: "1h", description: "Intensive repair mask tailored to your hair's unique needs." },
             { id: 4, name: "Bridal Updo Consultation", price: 120, duration: "2h", description: "Trial run for your perfect wedding day hairstyle." }
         ],
-        products: [
-            { id: 'p001', name: "Silk Smooth Shampoo", price: 32.00, desc: "A sulfate-free cleanser for ultimate shine.", image: CONFIG.brand.imagePlaceholder(300, 300, "Shampoo") },
-            { id: 'p002', name: "Revive & Shine Comb Set", price: 19.50, desc: "Anti-static, wide-tooth detangling comb.", image: CONFIG.brand.imagePlaceholder(300, 300, "Comb Set") },
-            { id: 'p003', name: "Pro Styling Wand", price: 149.00, desc: "Ceramic barrel for long-lasting curls.", image: CONFIG.brand.imagePlaceholder(300, 300, "Styling Tool") }
-        ],
+        // Products will be defined after CONFIG is initialized
+        products: [], 
         stylists: ["Alex (Master Stylist)", "Jordan (Color Specialist)", "Kai (Junior Stylist)"],
         testimonials: [
             { review: "My balayage has never looked better. Alex is a true artist!", client: "Sarah J." },
@@ -117,6 +130,14 @@
             mapEmbed: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1000!2d-118.3615!3d34.0757!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTPCsDQ0JzI5LjQiTiAxMTjCsDIxJzQxLjQiVw!5e0!3m2!1sen!2sus!4v1625068800000!5m2!1sen!2sus"
         }
     };
+    
+    // Now that CONFIG is initialized, define the products using the imagePlaceholder function
+    CONFIG.products = [
+        { id: 'p001', name: "Silk Smooth Shampoo", price: 32.00, desc: "A sulfate-free cleanser for ultimate shine.", image: CONFIG.brand.imagePlaceholder(300, 300, "Shampoo") },
+        { id: 'p002', name: "Revive & Shine Comb Set", price: 19.50, desc: "Anti-static, wide-tooth detangling comb.", image: CONFIG.brand.imagePlaceholder(300, 300, "Comb Set") },
+        { id: 'p003', name: "Pro Styling Wand", price: 149.00, desc: "Ceramic barrel for long-lasting curls.", image: CONFIG.brand.imagePlaceholder(300, 300, "Styling Tool") }
+    ];
+
 
     // --- 2. INTEGRATION HOOKS (Placeholder for future backend integration) ---
     // These functions log structured data to the console, acting as a placeholder
@@ -142,46 +163,29 @@
     // --- 3. THEME LOGIC ---
     function setTheme(mode) {
         const html = document.documentElement;
-        const icon = document.getElementById('theme-icon');
+        const lightBtn = document.getElementById('set-light-mode-btn');
+        const darkBtn = document.getElementById('set-dark-mode-btn');
+
+        if (!lightBtn || !darkBtn) return; 
+
+        // Remove highlight from both buttons first
+        lightBtn.classList.remove('ring-2', 'ring-pink-500', 'ring-offset-2', 'dark:ring-offset-gray-800');
+        darkBtn.classList.remove('ring-2', 'ring-pink-500', 'ring-offset-2', 'dark:ring-offset-gray-800');
 
         if (mode === 'dark') {
             html.classList.add('dark');
-            icon.setAttribute('data-lucide', 'moon');
             localStorage.setItem('theme', 'dark');
+            // Apply highlight to the dark mode button
+            darkBtn.classList.add('ring-2', 'ring-pink-500', 'ring-offset-2', 'dark:ring-offset-gray-800');
         } else {
             html.classList.remove('dark');
-            icon.setAttribute('data-lucide', 'sun');
             localStorage.setItem('theme', 'light');
+            // Apply highlight to the light mode button
+            lightBtn.classList.add('ring-2', 'ring-pink-500', 'ring-offset-2', 'dark:ring-offset-gray-800');
         }
-        // Re-initialize icons to ensure the new icon is visible
-        lucide.createIcons();
+        // No need to call lucide.createIcons() as icons are static
     }
 
-    function toggleTheme() {
-        if (document.documentElement.classList.contains('dark')) {
-            setTheme('light');
-        } else {
-            setTheme('dark');
-        }
-    }
-
-    // Initial theme setup (Run immediately to prevent flicker)
-    function initializeTheme() {
-        const savedTheme = localStorage.getItem('theme');
-        const systemPreference = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-
-        if (savedTheme) {
-            setTheme(savedTheme);
-        } else {
-            setTheme(systemPreference);
-        }
-
-        // Attach listener to the new button
-        const toggleButton = document.getElementById('theme-toggle-btn');
-        if (toggleButton) {
-            toggleButton.addEventListener('click', toggleTheme);
-        }
-    }
 
     // --- 4. UTILITY FUNCTIONS ---
 
@@ -208,12 +212,24 @@
     let cart = [];
     let isGalleryInitialized = false;
 
-    // Run theme initialization early
-    document.addEventListener('DOMContentLoaded', initializeTheme);
-
     document.addEventListener('DOMContentLoaded', () => {
-        // Initialize Lucide Icons (called again here to ensure all other icons are created)
+        const savedTheme = localStorage.getItem('theme');
+        const systemPreference = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        const initialMode = savedTheme || systemPreference;
+
+        // Initialize Lucide Icons first
         lucide.createIcons();
+        
+        // --- Theme Button Listeners ---
+        const lightBtn = document.getElementById('set-light-mode-btn');
+        const darkBtn = document.getElementById('set-dark-mode-btn');
+
+        if (lightBtn) lightBtn.addEventListener('click', () => setTheme('light'));
+        if (darkBtn) darkBtn.addEventListener('click', () => setTheme('dark'));
+        
+        // Set initial theme state to highlight the correct button
+        setTheme(initialMode);
+        // -----------------------------
 
         // Populate dynamic content (Stylist list, FAQs, etc.)
         populateStylistOptions();
@@ -637,10 +653,15 @@
         </div>
 
         <!-- Desktop CTAs and Cart -->
-        <div class="flex items-center space-x-4">
-            <!-- Theme Toggle Button -->
-            <button id="theme-toggle-btn" class="p-2 text-gray-700 hover:text-pink-600 transition-colors dark:text-gray-300 dark:hover:text-pink-400" aria-label="Toggle theme">
-                <i data-lucide="sun" class="w-6 h-6" id="theme-icon"></i>
+        <div class="flex items-center space-x-2">
+            <!-- Theme Toggle Buttons (Always visible) -->
+            <!-- Light Mode Button -->
+            <button id="set-light-mode-btn" class="p-2 rounded-full transition-all duration-200 text-gray-700 hover:text-pink-600 dark:text-gray-300 dark:hover:text-pink-400" aria-label="Set light mode">
+                <i data-lucide="sun" class="w-6 h-6"></i>
+            </button>
+            <!-- Dark Mode Button -->
+            <button id="set-dark-mode-btn" class="p-2 rounded-full transition-all duration-200 text-gray-700 hover:text-pink-600 dark:text-gray-300 dark:hover:text-pink-400" aria-label="Set dark mode">
+                <i data-lucide="moon" class="w-6 h-6"></i>
             </button>
             <!-- Mini Cart Button -->
             <button id="cart-btn" class="relative p-2 text-gray-700 hover:text-pink-600 transition-colors dark:text-gray-300 dark:hover:text-pink-400 hidden sm:block">
