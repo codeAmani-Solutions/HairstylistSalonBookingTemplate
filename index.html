@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Gilded Tress - Premium Hairstyling & Salon</title>
+    <!-- Load Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Configure Tailwind to use the 'class' strategy for dark mode
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    <!-- Load Lucide Icons for aesthetic vectors -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Define a custom font and set smooth scrolling */
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@100..900&display=swap');
+
+        :root {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #333333;
+        }
+        .serif-font {
+            font-family: 'Playfair Display', serif;
+        }
+        /* Custom styling for the chic aesthetic */
+        .primary-cta-btn {
+            background: linear-gradient(135deg, #d8a4b4, #b97a8b);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .primary-cta-btn:hover {
+            background: linear-gradient(135deg, #b97a8b, #d8a4b4);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+        /* Style for the gallery drop zone */
+        #gallery-drop-zone {
+            border: 3px dashed #d8a4b4;
+            transition: all 0.2s;
+        }
+        #gallery-drop-zone.drag-over {
+            border-color: #6d28d9; /* Deep Purple on drag */
+            background-color: #fce7f3; /* Light Pink background */
+        }
+        .dark #gallery-drop-zone.drag-over {
+             border-color: #fce7f3; 
+             background-color: #831843;
+        }
+        .mini-cart-drawer {
+            transition: transform 0.3s ease-out;
+            transform: translateX(100%);
+        }
+        .mini-cart-drawer.open {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body class="bg-neutral-50 dark:bg-gray-900">
+
+<!-- 
+    ========================================================
+    JAVASCRIPT CONFIGURATION AND LOGIC
+    All site content, colors, and dynamic features are here
+    ======================================================== 
+-->
+<script>
+    // --- 1. SITE CONFIGURATION OBJECT ---
+    // Define all primary content, links, and styling variables here for easy customization.
+    
+    // FIX for ReferenceError: Extract the primary color hex (without #) to a constant 
+    // so it can be used within the CONFIG object definition without self-reference.
+    const CONFIG_PRIMARY_COLOR_HEX = "d8a4b4"; 
+
+    const CONFIG = {
+        brand: {
+            name: "The Gilded Tress",
+            tagline: "Where Artistry Meets Hair Health",
+            primaryColor: "#d8a4b4", // Dusty Rose
+            accentColor: "#fcd34d", // Amber Gold
+            imagePlaceholder: (w, h, text) => `https://placehold.co/${w}x${h}/${CONFIG_PRIMARY_COLOR_HEX}/ffffff?text=${text.replace(' ', '+')}`,
+        },
+        services: [
+            { id: 1, name: "Signature Cut & Style", price: 85, duration: "1.5h", description: "Personalized consultation, precision cut, and professional blow-dry." },
+            { id: 2, name: "Full Balayage Transformation", price: 250, duration: "3.5h", description: "Hand-painted highlights for a sun-kissed, low-maintenance look." },
+            { id: 3, name: "Deep Conditioning Treatment", price: 45, duration: "1h", description: "Intensive repair mask tailored to your hair's unique needs." },
+            { id: 4, name: "Bridal Updo Consultation", price: 120, duration: "2h", description: "Trial run for your perfect wedding day hairstyle." }
+        ],
+        products: [
+            { id: 'p001', name: "Silk Smooth Shampoo", price: 32.00, desc: "A sulfate-free cleanser for ultimate shine.", image: CONFIG.brand.imagePlaceholder(300, 300, "Shampoo") },
+            { id: 'p002', name: "Revive & Shine Comb Set", price: 19.50, desc: "Anti-static, wide-tooth detangling comb.", image: CONFIG.brand.imagePlaceholder(300, 300, "Comb Set") },
+            { id: 'p003', name: "Pro Styling Wand", price: 149.00, desc: "Ceramic barrel for long-lasting curls.", image: CONFIG.brand.imagePlaceholder(300, 300, "Styling Tool") }
+        ],
+        stylists: ["Alex (Master Stylist)", "Jordan (Color Specialist)", "Kai (Junior Stylist)"],
+        testimonials: [
+            { review: "My balayage has never looked better. Alex is a true artist!", client: "Sarah J." },
+            { review: "Professional, relaxing, and my hair feels healthier than ever. Highly recommend.", client: "Mark R." },
+            { review: "The deep conditioning treatment changed my life. Worth every penny!", client: "Emily K." }
+        ],
+        faqs: [
+            { question: "How far in advance should I book?", answer: "We recommend booking at least two weeks out, especially for weekend appointments." },
+            { question: "Do you offer consultations?", answer: "Yes! All major color services include a complimentary 15-minute consultation prior to the appointment." },
+            { question: "What is your cancellation policy?", answer: "We require 24 hours notice for cancellations or rescheduling. Late cancellations incur a 50% service fee." }
+        ],
+        socialLinks: [
+            { name: "Instagram", url: "#", icon: "instagram" },
+            { name: "Facebook", url: "#", icon: "facebook" }
+        ],
+        contact: {
+            address: "123 Chic Avenue, Suite 400, Beauty City, CA 90210",
+            phone: "(555) 555-TRESS",
+            email: "hello@thegildedtress.com",
+            mapEmbed: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1000!2d-118.3615!3d34.0757!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTPCsDQ0JzI5LjQiTiAxMTjCsDIxJzQxLjQiVw!5e0!3m2!1sen!2sus!4v1625068800000!5m2!1sen!2sus"
+        }
+    };
+
+    // --- 2. INTEGRATION HOOKS (Placeholder for future backend integration) ---
+    // These functions log structured data to the console, acting as a placeholder
+    // for future integrations with Stripe, Shopify, or a Booking system.
+    window.integration = {
+        onAddToCart: (payload) => {
+            console.log("🛒 ADD TO CART TRIGGERED:", payload);
+            // Future integration point:
+            // Example: Add code here to interact with a Shopify/Stripe/E-commerce API
+            // fetch('/api/cart', { method: 'POST', body: JSON.stringify(payload) })
+            alertMessage("Item added to cart! (Check console for payload)", "success");
+        },
+        onBook: (payload) => {
+            console.log("📅 BOOKING SUBMISSION TRIGGERED:", payload);
+            // Future integration point:
+            // Example: Add code here to interact with a booking platform API (e.g., Fresha, Square Appointments)
+            // fetch('/api/booking', { method: 'POST', body: JSON.stringify(payload) })
+            alertMessage("Appointment requested! We will confirm shortly. (Check console for payload)", "success");
+            document.getElementById('booking-form').reset();
+        }
+    };
+
+    // --- 3. THEME LOGIC ---
+    function setTheme(mode) {
+        const html = document.documentElement;
+        const icon = document.getElementById('theme-icon');
+
+        if (mode === 'dark') {
+            html.classList.add('dark');
+            icon.setAttribute('data-lucide', 'moon');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            html.classList.remove('dark');
+            icon.setAttribute('data-lucide', 'sun');
+            localStorage.setItem('theme', 'light');
+        }
+        // Re-initialize icons to ensure the new icon is visible
+        lucide.createIcons();
+    }
+
+    function toggleTheme() {
+        if (document.documentElement.classList.contains('dark')) {
+            setTheme('light');
+        } else {
+            setTheme('dark');
+        }
+    }
+
+    // Initial theme setup (Run immediately to prevent flicker)
+    function initializeTheme() {
+        const savedTheme = localStorage.getItem('theme');
+        const systemPreference = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+
+        if (savedTheme) {
+            setTheme(savedTheme);
+        } else {
+            setTheme(systemPreference);
+        }
+
+        // Attach listener to the new button
+        const toggleButton = document.getElementById('theme-toggle-btn');
+        if (toggleButton) {
+            toggleButton.addEventListener('click', toggleTheme);
+        }
+    }
+
+    // --- 4. UTILITY FUNCTIONS ---
+
+    // Simple custom alert/message box function (replaces alert() per instructions)
+    function alertMessage(message, type = 'info') {
+        const messageBox = document.getElementById('message-box');
+        const alertClass = {
+            success: 'bg-green-100 text-green-800 border-green-400 dark:bg-green-900 dark:text-green-300 dark:border-green-600',
+            error: 'bg-red-100 text-red-800 border-red-400 dark:bg-red-900 dark:text-red-300 dark:border-red-600',
+            info: 'bg-indigo-100 text-indigo-800 border-indigo-400 dark:bg-indigo-900 dark:text-indigo-300 dark:border-indigo-600'
+        }[type] || 'bg-gray-100 text-gray-800 border-gray-400 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500';
+
+        messageBox.innerHTML = `
+            <div class="p-4 rounded-lg border-l-4 ${alertClass}" role="alert">
+                <p class="font-bold">${type.charAt(0).toUpperCase() + type.slice(1)}</p>
+                <p>${message}</p>
+            </div>
+        `;
+        messageBox.classList.remove('hidden');
+        setTimeout(() => messageBox.classList.add('hidden'), 5000);
+    }
+
+    // --- 5. GLOBAL STATE AND INITIALIZATION ---
+    let cart = [];
+    let isGalleryInitialized = false;
+
+    // Run theme initialization early
+    document.addEventListener('DOMContentLoaded', initializeTheme);
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Initialize Lucide Icons (called again here to ensure all other icons are created)
+        lucide.createIcons();
+
+        // Populate dynamic content (Stylist list, FAQs, etc.)
+        populateStylistOptions();
+        populateFAQs();
+        populateServices();
+        populateProducts();
+        populateTestimonials();
+
+        // Attach event listeners
+        attachNavListeners();
+        attachBookingFormListener();
+        attachCartListeners();
+    });
+
+    // --- 6. DYNAMIC CONTENT RENDERING ---
+
+    function populateStylistOptions() {
+        const select = document.getElementById('stylist-select');
+        if (select) {
+            CONFIG.stylists.forEach(stylist => {
+                const option = document.createElement('option');
+                option.value = stylist;
+                option.textContent = stylist;
+                select.appendChild(option);
+            });
+        }
+    }
+
+    function populateFAQs() {
+        const container = document.getElementById('faq-container');
+        if (!container) return;
+
+        CONFIG.faqs.forEach((faq, index) => {
+            const item = document.createElement('div');
+            item.className = 'border-b border-pink-100 dark:border-pink-800 py-4';
+            item.innerHTML = `
+                <button type="button" class="flex justify-between items-center w-full text-left font-semibold text-gray-800 dark:text-gray-200 hover:text-pink-600 dark:hover:text-pink-400 transition-colors" data-faq-toggle="${index}">
+                    ${faq.question}
+                    <i data-lucide="chevron-down" class="h-5 w-5 transition-transform duration-300" id="faq-icon-${index}"></i>
+                </button>
+                <div id="faq-content-${index}" class="mt-2 text-gray-600 dark:text-gray-400 hidden transition-max-height duration-500 ease-in-out overflow-hidden" style="max-height: 0;">
+                    <p class="pt-2">${faq.answer}</p>
+                </div>
+            `;
+            container.appendChild(item);
+
+            // Attach toggle listener
+            item.querySelector(`[data-faq-toggle="${index}"]`).addEventListener('click', () => {
+                const content = document.getElementById(`faq-content-${index}`);
+                const icon = document.getElementById(`faq-icon-${index}`);
+                const isHidden = content.classList.contains('hidden');
+
+                if (isHidden) {
+                    content.classList.remove('hidden');
+                    content.style.maxHeight = content.scrollHeight + 'px';
+                    icon.style.transform = 'rotate(180deg)';
+                } else {
+                    content.style.maxHeight = '0';
+                    content.addEventListener('transitionend', function handler() {
+                        content.classList.add('hidden');
+                        content.removeEventListener('transitionend', handler);
+                    }, { once: true });
+                    icon.style.transform = 'rotate(0deg)';
+                }
+            });
+        });
+    }
+
+    function populateServices() {
+        const container = document.getElementById('services-grid');
+        if (!container) return;
+
+        container.innerHTML = CONFIG.services.map(service => `
+            <div class="bg-white dark:bg-gray-900 p-6 md:p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-pink-100 dark:border-pink-800">
+                <div class="flex items-start justify-between">
+                    <h3 class="serif-font text-2xl font-bold text-pink-600 dark:text-pink-400">${service.name}</h3>
+                    <span class="text-xl font-bold text-gray-900 dark:text-gray-100 ml-4">$${service.price}</span>
+                </div>
+                <p class="text-sm text-pink-500 dark:text-pink-300 mt-1 mb-3">Est. ${service.duration}</p>
+                <p class="text-gray-600 dark:text-gray-400">${service.description}</p>
+                <a href="#booking" class="mt-4 inline-block text-pink-500 dark:text-pink-300 font-medium hover:text-pink-700 dark:hover:text-pink-500 transition-colors flex items-center">
+                    Book Now <i data-lucide="arrow-right" class="w-4 h-4 ml-2"></i>
+                </a>
+            </div>
+        `).join('');
+        lucide.createIcons(); // Re-initialize icons
+    }
+
+    function populateProducts() {
+        const container = document.getElementById('products-grid');
+        if (!container) return;
+
+        container.innerHTML = CONFIG.products.map(product => `
+            <div class="bg-white dark:bg-gray-900 rounded-xl shadow-lg overflow-hidden flex flex-col h-full border border-pink-100 dark:border-pink-800">
+                <img src="${product.image}" alt="${product.name}" class="w-full h-48 object-cover object-center">
+                <div class="p-4 md:p-6 flex flex-col flex-grow">
+                    <h3 class="serif-font text-xl font-bold text-gray-800 dark:text-gray-200 flex-grow">${product.name}</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">${product.desc}</p>
+                    <div class="flex justify-between items-center mt-2">
+                        <span class="text-2xl font-extrabold text-pink-600 dark:text-pink-400">$${product.price.toFixed(2)}</span>
+                        <button type="button" 
+                                class="bg-pink-500 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-pink-600 transition-colors flex items-center add-to-cart-btn"
+                                data-product-id="${product.id}"
+                                data-product-name="${product.name}"
+                                data-product-price="${product.price.toFixed(2)}"
+                                data-product-qty="1">
+                            <i data-lucide="shopping-cart" class="w-4 h-4 mr-2"></i> Add to Cart
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+        lucide.createIcons(); // Re-initialize icons
+        attachAddToCartListeners();
+    }
+
+    function populateTestimonials() {
+        const container = document.getElementById('testimonials-container');
+        if (!container) return;
+
+        container.innerHTML = CONFIG.testimonials.map(testimonial => `
+            <div class="bg-white dark:bg-gray-900 p-6 md:p-8 rounded-xl shadow-xl border border-pink-100/50 dark:border-pink-800/50">
+                <div class="flex text-pink-400 mb-3">
+                    ${'<i data-lucide="star" class="w-5 h-5 fill-pink-400"></i>'.repeat(5)}
+                </div>
+                <blockquote class="text-gray-700 dark:text-gray-300 italic text-lg">
+                    "${testimonial.review}"
+                </blockquote>
+                <p class="mt-4 font-semibold text-pink-600 dark:text-pink-400">- ${testimonial.client}</p>
+            </div>
+        `).join('');
+        lucide.createIcons();
+    }
+
+
+    // --- 7. NAVIGATION & UI LOGIC ---
+
+    function attachNavListeners() {
+        const menuButton = document.getElementById('mobile-menu-btn');
+        const menuDrawer = document.getElementById('mobile-menu');
+        const cartButton = document.getElementById('cart-btn');
+        const cartDrawer = document.getElementById('mini-cart-drawer');
+        const cartCloseButton = document.getElementById('close-cart-btn');
+
+        // Mobile Menu Toggle
+        menuButton.addEventListener('click', () => {
+            menuDrawer.classList.toggle('hidden');
+            menuDrawer.classList.toggle('flex');
+        });
+
+        // Cart Drawer Toggle
+        cartButton.addEventListener('click', () => {
+            cartDrawer.classList.add('open');
+            document.getElementById('cart-overlay').classList.remove('hidden');
+        });
+        cartCloseButton.addEventListener('click', () => {
+            cartDrawer.classList.remove('open');
+            document.getElementById('cart-overlay').classList.add('hidden');
+        });
+        document.getElementById('cart-overlay').addEventListener('click', (e) => {
+            if (e.target.id === 'cart-overlay') {
+                cartDrawer.classList.remove('open');
+                document.getElementById('cart-overlay').classList.add('hidden');
+            }
+        });
+    }
+
+    // --- 8. BOOKING LOGIC ---
+
+    function attachBookingFormListener() {
+        const form = document.getElementById('booking-form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const formData = new FormData(form);
+                const payload = {};
+                formData.forEach((value, key) => payload[key] = value);
+
+                // Validation placeholder
+                if (!payload.name || !payload.date || !payload.time || !payload.service || !payload.stylist) {
+                    alertMessage("Please fill in all required fields to submit your booking.", "error");
+                    return;
+                }
+
+                // Call the integration hook
+                window.integration.onBook(payload);
+            });
+        }
+    }
+
+    // --- 9. CART & PRODUCT LOGIC ---
+
+    function attachAddToCartListeners() {
+        document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const target = e.currentTarget;
+                const item = {
+                    id: target.dataset.productId,
+                    name: target.dataset.productName,
+                    price: parseFloat(target.dataset.productPrice),
+                    quantity: parseInt(target.dataset.productQty, 10)
+                };
+
+                addItemToCart(item);
+                window.integration.onAddToCart(item);
+                document.getElementById('mini-cart-drawer').classList.add('open');
+                document.getElementById('cart-overlay').classList.remove('hidden');
+            });
+        });
+    }
+
+    function addItemToCart(newItem) {
+        const existingItem = cart.find(item => item.id === newItem.id);
+
+        if (existingItem) {
+            existingItem.quantity += newItem.quantity;
+        } else {
+            cart.push(newItem);
+        }
+
+        updateCartUI();
+    }
+
+    function updateCartUI() {
+        const cartItemsContainer = document.getElementById('cart-items-container');
+        const cartTotalElement = document.getElementById('cart-total');
+        const cartCountElement = document.getElementById('cart-count');
+        const emptyCartMessage = document.getElementById('empty-cart-message');
+
+        // Update count badge
+        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+        cartCountElement.textContent = totalItems;
+        cartCountElement.classList.toggle('hidden', totalItems === 0);
+
+        if (cart.length === 0) {
+            cartItemsContainer.innerHTML = '';
+            emptyCartMessage.classList.remove('hidden');
+        } else {
+            emptyCartMessage.classList.add('hidden');
+            cartItemsContainer.innerHTML = cart.map(item => `
+                <li class="flex justify-between items-center py-3 border-b border-gray-100 dark:border-gray-700">
+                    <div>
+                        <p class="font-semibold text-gray-800 dark:text-gray-200">${item.name}</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Qty: ${item.quantity} x $${item.price.toFixed(2)}</p>
+                    </div>
+                    <span class="font-bold text-pink-600 dark:text-pink-400">$${(item.price * item.quantity).toFixed(2)}</span>
+                </li>
+            `).join('');
+        }
+
+        const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        cartTotalElement.textContent = `$${total.toFixed(2)}`;
+    }
+
+    // --- 10. GALLERY LOGIC (Local File Preview) ---
+
+    function initGalleryLogic() {
+        if (isGalleryInitialized) return;
+        isGalleryInitialized = true;
+
+        const dropZone = document.getElementById('gallery-drop-zone');
+        const fileInput = document.getElementById('gallery-file-input');
+        const previewContainer = document.getElementById('gallery-preview-container');
+
+        // Add placeholders
+        const placeholderImages = [
+            CONFIG.brand.imagePlaceholder(400, 400, "Elegant Updo"),
+            CONFIG.brand.imagePlaceholder(400, 400, "Fresh Color"),
+            CONFIG.brand.imagePlaceholder(400, 400, "Clean Fade"),
+            CONFIG.brand.imagePlaceholder(400, 400, "Balayage")
+        ];
+        placeholderImages.forEach(src => {
+            const img = document.createElement('img');
+            img.src = src;
+            img.alt = "Work Sample";
+            img.className = "w-full h-full object-cover rounded-xl shadow-md";
+            previewContainer.appendChild(img);
+        });
+
+        // Drop Zone Event Handlers
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+            document.body.addEventListener(eventName, preventDefaults, false);
+        });
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.add('drag-over'), false);
+        });
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.remove('drag-over'), false);
+        });
+
+        dropZone.addEventListener('drop', handleDrop, false);
+        fileInput.addEventListener('change', (e) => handleFiles(e.target.files), false);
+        dropZone.addEventListener('click', () => fileInput.click()); // Enable click to open file picker
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        function handleDrop(e) {
+            let dt = e.dataTransfer;
+            let files = dt.files;
+            handleFiles(files);
+        }
+
+        function handleFiles(files) {
+            files = [...files];
+            files.forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const newImg = document.createElement('img');
+                        newImg.src = e.target.result;
+                        newImg.alt = "Client Uploaded Image";
+                        newImg.className = "w-full h-full object-cover rounded-xl shadow-md transition-opacity duration-300 opacity-0";
+
+                        // Insert new image at the start of the grid
+                        if (previewContainer.firstChild) {
+                            previewContainer.insertBefore(newImg, previewContainer.firstChild);
+                        } else {
+                            previewContainer.appendChild(newImg);
+                        }
+
+                        // Animate fade-in
+                        setTimeout(() => newImg.classList.remove('opacity-0'), 10);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            alertMessage(`${files.length} image(s) loaded successfully for local preview!`, "info");
+        }
+    }
+
+    // Call initGalleryLogic when the section becomes visible/ready
+    window.addEventListener('scroll', function checkGallery() {
+        const gallerySection = document.getElementById('work-gallery');
+        if (gallerySection && !isGalleryInitialized) {
+            const rect = gallerySection.getBoundingClientRect();
+            if (rect.top < window.innerHeight && rect.bottom >= 0) {
+                initGalleryLogic();
+                window.removeEventListener('scroll', checkGallery);
+            }
+        }
+    });
+    // Also run on load just in case the section is in the viewport
+    document.addEventListener('DOMContentLoaded', () => {
+        const gallerySection = document.getElementById('work-gallery');
+        if (gallerySection) {
+            const rect = gallerySection.getBoundingClientRect();
+            if (rect.top < window.innerHeight && rect.bottom >= 0) {
+                initGalleryLogic();
+            }
+        }
+    });
+
+</script>
+
+<!-- Custom Message Box for Non-Alert UI -->
+<div id="message-box" class="fixed top-5 right-5 z-[100] w-full max-w-xs hidden"></div>
+
+<!-- Mini Cart Overlay -->
+<div id="cart-overlay" class="fixed inset-0 bg-black bg-opacity-30 z-40 hidden"></div>
+
+<!-- Mini Cart Drawer -->
+<div id="mini-cart-drawer" class="mini-cart-drawer fixed top-0 right-0 w-full md:w-96 h-full bg-white dark:bg-gray-800 shadow-2xl z-50 flex flex-col p-6 overflow-y-auto">
+    <div class="flex justify-between items-center pb-4 border-b border-pink-100 dark:border-pink-800">
+        <h2 class="serif-font text-2xl font-bold text-gray-900 dark:text-white">Your Cart</h2>
+        <button id="close-cart-btn" class="p-2 text-gray-500 hover:text-pink-600 dark:text-gray-400 dark:hover:text-pink-400 transition-colors">
+            <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+    </div>
+
+    <ul id="cart-items-container" class="flex-grow mt-4 space-y-2">
+        <!-- Cart items will be rendered here by JavaScript -->
+    </ul>
+
+    <div id="empty-cart-message" class="text-center py-12 text-gray-500 dark:text-gray-400 text-lg">
+        <i data-lucide="shopping-cart" class="w-10 h-10 mx-auto mb-2 text-pink-300"></i>
+        <p>Your cart is empty.</p>
+    </div>
+
+    <div class="pt-6 border-t border-pink-100 dark:border-pink-800 mt-6">
+        <div class="flex justify-between items-center mb-4">
+            <span class="text-xl font-bold text-gray-800 dark:text-gray-200">Total:</span>
+            <span id="cart-total" class="text-3xl font-extrabold text-pink-600 dark:text-pink-400">$0.00</span>
+        </div>
+
+        <p class="text-xs text-red-500 dark:text-red-400 mb-3">NOTE: Checkout is currently disabled. This is a placeholder for future payment integration (Stripe/Shopify).</p>
+
+        <button disabled class="w-full primary-cta-btn opacity-50 cursor-not-allowed text-white font-bold py-3 rounded-xl mb-3">
+            <i data-lucide="lock" class="w-4 h-4 inline mr-2"></i> Checkout (Disabled)
+        </button>
+        <button disabled class="w-full bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300 font-bold py-3 rounded-xl cursor-not-allowed">
+            Pay with PayPal (Disabled)
+        </button>
+    </div>
+</div>
+
+<!-- 
+    ========================================================
+    HEADER & NAVIGATION
+    ======================================================== 
+-->
+<header class="sticky top-0 z-30 bg-white/95 backdrop-blur-sm shadow-sm dark:bg-gray-800/95 dark:shadow-lg">
+    <nav class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+        <!-- Logo/Brand Name -->
+        <a href="#" class="text-2xl font-bold text-pink-600 dark:text-pink-400 tracking-wider serif-font">
+            The Gilded Tress
+        </a>
+
+        <!-- Desktop Navigation -->
+        <div class="hidden lg:flex space-x-8 text-gray-700 dark:text-gray-300 font-medium">
+            <a href="#services" class="hover:text-pink-600 dark:hover:text-pink-400 transition-colors">Services</a>
+            <a href="#gallery" class="hover:text-pink-600 dark:hover:text-pink-400 transition-colors">Work</a>
+            <a href="#products" class="hover:text-pink-600 dark:hover:text-pink-400 transition-colors">Shop</a>
+            <a href="#about" class="hover:text-pink-600 dark:hover:text-pink-400 transition-colors">About</a>
+            <a href="#contact" class="hover:text-pink-600 dark:hover:text-pink-400 transition-colors">Contact</a>
+            <a href="#faq" class="hover:text-pink-600 dark:hover:text-pink-400 transition-colors">FAQ</a>
+        </div>
+
+        <!-- Desktop CTAs and Cart -->
+        <div class="flex items-center space-x-4">
+            <!-- Theme Toggle Button -->
+            <button id="theme-toggle-btn" class="p-2 text-gray-700 hover:text-pink-600 transition-colors dark:text-gray-300 dark:hover:text-pink-400" aria-label="Toggle theme">
+                <i data-lucide="sun" class="w-6 h-6" id="theme-icon"></i>
+            </button>
+            <!-- Mini Cart Button -->
+            <button id="cart-btn" class="relative p-2 text-gray-700 hover:text-pink-600 transition-colors dark:text-gray-300 dark:hover:text-pink-400 hidden sm:block">
+                <i data-lucide="shopping-bag" class="w-6 h-6"></i>
+                <span id="cart-count" class="hidden absolute -top-1 -right-1 bg-pink-600 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">0</span>
+            </button>
+            <!-- Primary CTA Button -->
+            <a href="#booking" class="hidden lg:block primary-cta-btn text-white font-bold py-2 px-6 rounded-full shadow-lg">
+                Book Now
+            </a>
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-btn" class="lg:hidden p-2 text-gray-700 hover:text-pink-600 transition-colors dark:text-gray-300 dark:hover:text-pink-400">
+                <i data-lucide="menu" class="w-6 h-6"></i>
+            </button>
+        </div>
+    </nav>
+</header>
+
+<!-- Mobile Menu Drawer (Hidden by default) -->
+<div id="mobile-menu" class="hidden fixed inset-0 z-20 bg-white/95 backdrop-blur-sm flex flex-col lg:hidden pt-20 dark:bg-gray-900/95">
+    <div class="flex flex-col space-y-4 px-8 text-xl font-medium text-center">
+        <a href="#services" class="py-3 border-b hover:text-pink-600 dark:border-gray-700 dark:text-gray-200 dark:hover:text-pink-400" onclick="document.getElementById('mobile-menu-btn').click()">Services</a>
+        <a href="#gallery" class="py-3 border-b hover:text-pink-600 dark:border-gray-700 dark:text-gray-200 dark:hover:text-pink-400" onclick="document.getElementById('mobile-menu-btn').click()">Work</a>
+        <a href="#products" class="py-3 border-b hover:text-pink-600 dark:border-gray-700 dark:text-gray-200 dark:hover:text-pink-400" onclick="document.getElementById('mobile-menu-btn').click()">Shop</a>
+        <a href="#about" class="py-3 border-b hover:text-pink-600 dark:border-gray-700 dark:text-gray-200 dark:hover:text-pink-400" onclick="document.getElementById('mobile-menu-btn').click()">About</a>
+        <a href="#contact" class="py-3 border-b hover:text-pink-600 dark:border-gray-700 dark:text-gray-200 dark:hover:text-pink-400" onclick="document.getElementById('mobile-menu-btn').click()">Contact</a>
+        <a href="#faq" class="py-3 border-b hover:text-pink-600 dark:border-gray-700 dark:text-gray-200 dark:hover:text-pink-400" onclick="document.getElementById('mobile-menu-btn').click()">FAQ</a>
+        <button id="mobile-cart-btn" class="relative primary-cta-btn text-white font-bold py-3 rounded-xl mt-4 w-full" onclick="document.getElementById('mobile-menu-btn').click(); document.getElementById('cart-btn').click();">
+            View Cart
+        </button>
+        <a href="#booking" class="primary-cta-btn text-white font-bold py-3 rounded-xl w-full" onclick="document.getElementById('mobile-menu-btn').click()">Book Appointment</a>
+    </div>
+</div>
+
+<main>
+    <!-- 
+        ========================================================
+        HERO SECTION
+        ======================================================== 
+    -->
+    <section id="hero" class="relative h-screen flex items-center justify-center overflow-hidden">
+        <!-- Background Image/Overlay -->
+        <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('${CONFIG.brand.imagePlaceholder(1920, 1080, "Luxury Hairstyling Background")}');">
+            <div class="absolute inset-0 bg-black opacity-30"></div>
+        </div>
+
+        <!-- Content -->
+        <div class="relative z-10 text-center px-4 max-w-4xl text-white">
+            <h1 class="serif-font text-5xl sm:text-7xl lg:text-8xl font-extrabold leading-tight tracking-tight drop-shadow-lg">
+                Your Hair, Elevated.
+            </h1>
+            <p class="mt-4 sm:mt-6 text-lg sm:text-2xl font-light tracking-wide drop-shadow-md">
+                Experience bespoke cuts, masterful color, and luxurious treatments in a tranquil, chic setting.
+            </p>
+            <div class="mt-8 sm:mt-10">
+                <a href="#booking" class="primary-cta-btn text-white text-xl font-bold py-4 px-10 rounded-full shadow-2xl uppercase tracking-wider hover:scale-105 transform transition duration-300">
+                    <i data-lucide="calendar-check" class="w-5 h-5 inline mr-2"></i> Book Now
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 
+        ========================================================
+        SERVICES & PRICING
+        ======================================================== 
+    -->
+    <section id="services" class="py-16 md:py-24 bg-neutral-50 dark:bg-gray-800">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="serif-font text-4xl md:text-5xl font-bold text-center text-gray-800 dark:text-white mb-4">Our Services</h2>
+            <p class="text-center text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-12">Precision, artistry, and the highest quality products define every service we offer.</p>
+            
+            <div id="services-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Services are dynamically loaded by JavaScript -->
+            </div>
+
+            <div class="text-center mt-12">
+                <a href="#booking" class="inline-block primary-cta-btn text-white font-bold py-3 px-8 rounded-full shadow-lg">
+                    View All & Book
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 
+        ========================================================
+        WORK GALLERY (WITH LOCAL FILE PREVIEW)
+        ======================================================== 
+    -->
+    <section id="gallery" class="py-16 md:py-24 bg-white dark:bg-gray-900">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="serif-font text-4xl md:text-5xl font-bold text-center text-gray-800 dark:text-white mb-4">Our Work</h2>
+            <p class="text-center text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-12">A portfolio of transformations. Drag and drop your own photos below to see them in the grid!</p>
+
+            <!-- Drop Zone / File Picker -->
+            <div id="gallery-drop-zone" class="p-8 mb-12 text-center rounded-xl bg-pink-50 hover:bg-pink-100 dark:bg-pink-900 dark:hover:bg-pink-800 transition-colors cursor-pointer dark:border-pink-500">
+                <input type="file" id="gallery-file-input" multiple accept="image/*" class="hidden">
+                <i data-lucide="image" class="w-10 h-10 mx-auto text-pink-600 dark:text-pink-400 mb-2"></i>
+                <p class="font-semibold text-gray-800 dark:text-white">Drag & Drop Images Here, or Click to Select Files</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">(Images are only stored locally in your browser for preview and are NOT saved to a server.)</p>
+            </div>
+
+            <!-- Image Grid -->
+            <div id="gallery-preview-container" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                <!-- Images loaded by JS (placeholders and user uploads) -->
+            </div>
+        </div>
+    </section>
+
+    <!-- 
+        ========================================================
+        BOOKING FORM
+        ======================================================== 
+    -->
+    <section id="booking" class="py-16 md:py-24 bg-neutral-100 dark:bg-gray-700">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-4xl mx-auto bg-white dark:bg-gray-900 p-6 sm:p-12 rounded-2xl shadow-2xl border border-pink-200 dark:border-pink-700">
+                <h2 class="serif-font text-4xl font-bold text-center text-pink-600 dark:text-pink-400 mb-2">Ready to Book?</h2>
+                <p class="text-center text-lg text-gray-600 dark:text-gray-400 mb-8">Secure your spot with our talented team.</p>
+
+                <form id="booking-form" class="space-y-6">
+                    <!-- Name & Email -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full Name *</label>
+                            <input type="text" id="name" name="name" required class="w-full p-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-pink-500 focus:border-pink-500">
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email *</label>
+                            <input type="email" id="email" name="email" required class="w-full p-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-pink-500 focus:border-pink-500">
+                        </div>
+                    </div>
+
+                    <!-- Date & Time -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Preferred Date *</label>
+                            <input type="date" id="date" name="date" required min="${new Date().toISOString().split('T')[0]}" class="w-full p-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-pink-500 focus:border-pink-500">
+                        </div>
+                        <div>
+                            <label for="time" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Preferred Time *</label>
+                            <input type="time" id="time" name="time" required class="w-full p-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-pink-500 focus:border-pink-500">
+                        </div>
+                    </div>
+
+                    <!-- Service & Stylist -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="service" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Service Requested *</label>
+                            <select id="service" name="service" required class="w-full p-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-pink-500 focus:border-pink-500 appearance-none">
+                                <option value="">Select a Service</option>
+                                ${CONFIG.services.map(s => `<option value="${s.name}">$${s.price} - ${s.name}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="stylist-select" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Preferred Stylist</label>
+                            <select id="stylist-select" name="stylist" class="w-full p-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-pink-500 focus:border-pink-500 appearance-none">
+                                <option value="">No Preference</option>
+                                <!-- Stylists are dynamically loaded by JavaScript -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Notes -->
+                    <div>
+                        <label for="notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Notes/Special Requests (Optional)</label>
+                        <textarea id="notes" name="notes" rows="3" class="w-full p-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-pink-500 focus:border-pink-500"></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full primary-cta-btn text-white text-lg font-bold py-3 rounded-xl shadow-lg hover:scale-[1.01] transform transition duration-200">
+                        Confirm Appointment Request
+                    </button>
+                    <p class="text-xs text-center text-gray-500 dark:text-gray-400 mt-3">* Submission logs structured data to the console for future API integration.</p>
+                </form>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 
+        ========================================================
+        FEATURED PRODUCTS / SHOP
+        ======================================================== 
+    -->
+    <section id="products" class="py-16 md:py-24 bg-white dark:bg-gray-900">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="serif-font text-4xl md:text-5xl font-bold text-center text-gray-800 dark:text-white mb-4">Shop Our Favorites</h2>
+            <p class="text-center text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-12">Professional-grade products trusted by our stylists, now available for your home.</p>
+
+            <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Products are dynamically loaded by JavaScript -->
+            </div>
+            
+            <div class="text-center mt-12">
+                <button id="shop-all-btn" class="inline-block bg-transparent border-2 border-pink-500 text-pink-500 font-bold py-3 px-8 rounded-full shadow-md hover:bg-pink-50 transition-colors dark:text-pink-400 dark:border-pink-400 dark:hover:bg-pink-900">
+                    Browse More Products
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 
+        ========================================================
+        TESTIMONIALS
+        ======================================================== 
+    -->
+    <section id="testimonials" class="py-16 md:py-24 bg-pink-50 dark:bg-pink-950">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="serif-font text-4xl md:text-5xl font-bold text-center text-gray-800 dark:text-white mb-12">What Clients Say</h2>
+            
+            <div id="testimonials-container" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Testimonials are dynamically loaded by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- 
+        ========================================================
+        ABOUT THE STYLIST / STORY
+        ======================================================== 
+    -->
+    <section id="about" class="py-16 md:py-24 bg-white dark:bg-gray-900">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col lg:flex-row items-center gap-12 max-w-5xl mx-auto">
+                <!-- Image -->
+                <div class="lg:w-1/3">
+                    <img src="${CONFIG.brand.imagePlaceholder(500, 700, "Portrait of Stylist")}" alt="Portrait of Stylist" class="w-full h-auto rounded-xl shadow-2xl border-4 border-pink-100 dark:border-pink-800">
+                </div>
+                <!-- Content -->
+                <div class="lg:w-2/3">
+                    <h2 class="serif-font text-4xl md:text-5xl font-bold text-gray-800 dark:text-white mb-4">Meet Our Founder, Amelia</h2>
+                    <p class="text-pink-600 dark:text-pink-400 text-xl italic mb-6">"My goal is not just to style hair, but to empower people."</p>
+                    
+                    <p class="text-gray-700 dark:text-gray-300 mb-4">
+                        With over 15 years in the industry, Amelia founded The Gilded Tress on the belief that luxury and hair health should go hand-in-hand. She specializes in seamless color, corrective work, and effortless, wearable styles. Her commitment to ongoing education ensures every client receives the most modern and personalized care.
+                    </p>
+                    <p class="text-gray-700 dark:text-gray-300 mb-6">
+                        The salon is a curated space designed for relaxation and inspiration—a true escape from the everyday. We can't wait to welcome you!
+                    </p>
+                    <a href="#booking" class="primary-cta-btn text-white font-bold py-3 px-6 rounded-full shadow-lg">
+                        Start Your Transformation
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 
+        ========================================================
+        CONTACT & LOCATION
+        ======================================================== 
+    -->
+    <section id="contact" class="py-16 md:py-24 bg-neutral-100 dark:bg-gray-700">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="serif-font text-4xl md:text-5xl font-bold text-center text-gray-800 dark:text-white mb-12">Find Us</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Contact Info -->
+                <div class="lg:col-span-1 space-y-6">
+                    <div class="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-lg border border-pink-100 dark:border-pink-800">
+                        <i data-lucide="map-pin" class="w-8 h-8 text-pink-600 dark:text-pink-400 mb-3"></i>
+                        <h3 class="font-semibold text-xl mb-1 text-gray-800 dark:text-gray-200">Visit Us</h3>
+                        <p class="text-gray-600 dark:text-gray-400">${CONFIG.contact.address}</p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-lg border border-pink-100 dark:border-pink-800">
+                        <i data-lucide="phone" class="w-8 h-8 text-pink-600 dark:text-pink-400 mb-3"></i>
+                        <h3 class="font-semibold text-xl mb-1 text-gray-800 dark:text-gray-200">Call Us</h3>
+                        <a href="tel:${CONFIG.contact.phone}" class="text-gray-600 hover:text-pink-600 transition-colors dark:text-gray-400 dark:hover:text-pink-400">${CONFIG.contact.phone}</a>
+                    </div>
+                    <div class="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-lg border border-pink-100 dark:border-pink-800">
+                        <i data-lucide="mail" class="w-8 h-8 text-pink-600 dark:text-pink-400 mb-3"></i>
+                        <h3 class="font-semibold text-xl mb-1 text-gray-800 dark:text-gray-200">Email Us</h3>
+                        <a href="mailto:${CONFIG.contact.email}" class="text-gray-600 hover:text-pink-600 transition-colors dark:text-gray-400 dark:hover:text-pink-400">${CONFIG.contact.email}</a>
+                    </div>
+                </div>
+
+                <!-- Map Placeholder -->
+                <div class="lg:col-span-2 bg-white dark:bg-gray-900 rounded-xl shadow-2xl overflow-hidden h-96">
+                    <iframe 
+                        src="${CONFIG.contact.mapEmbed}" 
+                        width="100%" 
+                        height="100%" 
+                        style="border:0;" 
+                        allowfullscreen="" 
+                        loading="lazy" 
+                        title="Salon Location Map">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 
+        ========================================================
+        FAQ & NEWSLETTER
+        ======================================================== 
+    -->
+    <section id="faq" class="py-16 md:py-24 bg-white dark:bg-gray-900">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <!-- FAQ Section -->
+                <div>
+                    <h2 class="serif-font text-4xl font-bold text-gray-800 dark:text-white mb-8">Frequently Asked Questions</h2>
+                    <div id="faq-container" class="divide-y divide-pink-100">
+                        <!-- FAQs are dynamically loaded by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Newsletter Signup -->
+                <div class="bg-pink-50 dark:bg-pink-900 p-8 rounded-2xl shadow-xl flex flex-col justify-center">
+                    <h3 class="serif-font text-3xl font-bold text-pink-600 dark:text-pink-400 mb-4">Stay Gilded</h3>
+                    <p class="text-gray-700 dark:text-gray-300 mb-6">Join our newsletter for exclusive offers, styling tips, and product announcements.</p>
+                    <form action="#" class="space-y-4">
+                        <input type="email" placeholder="Enter your email address" required class="w-full p-3 border border-pink-300 dark:border-pink-600 dark:bg-pink-950 dark:text-white rounded-lg focus:ring-pink-500 focus:border-pink-500">
+                        <button type="submit" class="w-full bg-pink-500 text-white font-bold py-3 rounded-lg hover:bg-pink-600 transition-colors">
+                            Subscribe Now
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<!-- 
+    ========================================================
+    FOOTER
+    ======================================================== 
+-->
+<footer class="bg-gray-800 text-white py-12">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 border-b border-gray-700 pb-8 mb-8">
+            <!-- Brand Info -->
+            <div>
+                <h3 class="serif-font text-2xl font-bold text-pink-300 mb-4">The Gilded Tress</h3>
+                <p class="text-gray-400 text-sm">Where hair health and luxurious artistry intertwine.</p>
+            </div>
+
+            <!-- Quick Links -->
+            <div>
+                <h4 class="font-semibold text-lg mb-4">Quick Links</h4>
+                <ul class="space-y-2 text-gray-400 text-sm">
+                    <li><a href="#services" class="hover:text-pink-300 transition-colors">Services</a></li>
+                    <li><a href="#booking" class="hover:text-pink-300 transition-colors">Book Appointment</a></li>
+                    <li><a href="#products" class="hover:text-pink-300 transition-colors">Shop Products</a></li>
+                    <li><a href="#about" class="hover:text-pink-300 transition-colors">Our Story</a></li>
+                </ul>
+            </div>
+
+            <!-- Contact -->
+            <div>
+                <h4 class="font-semibold text-lg mb-4">Contact</h4>
+                <ul class="space-y-2 text-gray-400 text-sm">
+                    <li><a href="tel:${CONFIG.contact.phone}" class="hover:text-pink-300 transition-colors">${CONFIG.contact.phone}</a></li>
+                    <li><a href="mailto:${CONFIG.contact.email}" class="hover:text-pink-300 transition-colors">${CONFIG.contact.email}</a></li>
+                    <li>${CONFIG.contact.address}</li>
+                </ul>
+            </div>
+
+            <!-- Social & Legal -->
+            <div>
+                <h4 class="font-semibold text-lg mb-4">Follow Us</h4>
+                <div class="flex space-x-4">
+                    ${CONFIG.socialLinks.map(link => `
+                        <a href="${link.url}" class="text-pink-300 hover:text-white transition-colors" aria-label="${link.name}">
+                            <i data-lucide="${link.icon}" class="w-6 h-6"></i>
+                        </a>
+                    `).join('')}
+                </div>
+            </div>
+        </div>
+
+        <!-- Copyright and Legal -->
+        <div class="text-center text-sm text-gray-500">
+            &copy; 2024 The Gilded Tress. All rights reserved. | <a href="#" class="hover:text-pink-300">Privacy Policy</a> | <a href="#" class="hover:text-pink-300">Terms of Service</a>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // Initialize icons in the footer
+    lucide.createIcons();
+</script>
+
+</body>
+</html>
