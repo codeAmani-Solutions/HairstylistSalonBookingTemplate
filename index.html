@@ -160,7 +160,7 @@
         }
     };
 
-    // --- 3. THEME LOGIC ---
+    // --- 3. THEME LOGIC (Two Dedicated Buttons - REVERTED) ---
     function setTheme(mode) {
         const html = document.documentElement;
         const lightBtn = document.getElementById('set-light-mode-btn');
@@ -168,24 +168,42 @@
 
         if (!lightBtn || !darkBtn) return; 
 
-        // Remove highlight from both buttons first
-        lightBtn.classList.remove('ring-2', 'ring-pink-500', 'ring-offset-2', 'dark:ring-offset-gray-800');
-        darkBtn.classList.remove('ring-2', 'ring-pink-500', 'ring-offset-2', 'dark:ring-offset-gray-800');
+        // Classes for the active theme highlight ring
+        const highlightClasses = ['ring-2', 'ring-pink-500', 'ring-offset-2', 'dark:ring-offset-gray-800'];
+        
+        // Clear the highlight ring from both buttons
+        lightBtn.classList.remove(...highlightClasses);
+        darkBtn.classList.remove(...highlightClasses);
 
         if (mode === 'dark') {
             html.classList.add('dark');
             localStorage.setItem('theme', 'dark');
-            // Apply highlight to the dark mode button
-            darkBtn.classList.add('ring-2', 'ring-pink-500', 'ring-offset-2', 'dark:ring-offset-gray-800');
+            // Highlight the dark mode button
+            darkBtn.classList.add(...highlightClasses);
         } else {
             html.classList.remove('dark');
             localStorage.setItem('theme', 'light');
-            // Apply highlight to the light mode button
-            lightBtn.classList.add('ring-2', 'ring-pink-500', 'ring-offset-2', 'dark:ring-offset-gray-800');
+            // Highlight the light mode button
+            lightBtn.classList.add(...highlightClasses);
         }
-        // No need to call lucide.createIcons() as icons are static
     }
 
+    // Initial theme setup (Run on DOM ready)
+    function initializeTheme() {
+        const savedTheme = localStorage.getItem('theme');
+        const systemPreference = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        const initialMode = savedTheme || systemPreference;
+        
+        // Set the initial visual state and highlight the correct button
+        setTheme(initialMode);
+
+        // Attach listeners to the dedicated buttons
+        const lightBtn = document.getElementById('set-light-mode-btn');
+        const darkBtn = document.getElementById('set-dark-mode-btn');
+
+        if (lightBtn) lightBtn.addEventListener('click', () => setTheme('light'));
+        if (darkBtn) darkBtn.addEventListener('click', () => setTheme('dark'));
+    }
 
     // --- 4. UTILITY FUNCTIONS ---
 
@@ -213,23 +231,11 @@
     let isGalleryInitialized = false;
 
     document.addEventListener('DOMContentLoaded', () => {
-        const savedTheme = localStorage.getItem('theme');
-        const systemPreference = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        const initialMode = savedTheme || systemPreference;
-
-        // Initialize Lucide Icons first
+        // Run theme initialization 
+        initializeTheme();
+        
+        // Initialize Lucide Icons (called again here to ensure all other icons are created)
         lucide.createIcons();
-        
-        // --- Theme Button Listeners ---
-        const lightBtn = document.getElementById('set-light-mode-btn');
-        const darkBtn = document.getElementById('set-dark-mode-btn');
-
-        if (lightBtn) lightBtn.addEventListener('click', () => setTheme('light'));
-        if (darkBtn) darkBtn.addEventListener('click', () => setTheme('dark'));
-        
-        // Set initial theme state to highlight the correct button
-        setTheme(initialMode);
-        // -----------------------------
 
         // Populate dynamic content (Stylist list, FAQs, etc.)
         populateStylistOptions();
@@ -656,11 +662,11 @@
         <div class="flex items-center space-x-2">
             <!-- Theme Toggle Buttons (Always visible) -->
             <!-- Light Mode Button -->
-            <button id="set-light-mode-btn" class="p-2 rounded-full transition-all duration-200 text-gray-700 hover:text-pink-600 dark:text-gray-300 dark:hover:text-pink-400" aria-label="Set light mode">
+            <button id="set-light-mode-btn" class="p-2 rounded-full transition-all duration-200 text-gray-700 hover:text-pink-600 dark:text-gray-300 dark:hover:text-pink-400 ring-offset-white dark:ring-offset-gray-800" aria-label="Set light mode">
                 <i data-lucide="sun" class="w-6 h-6"></i>
             </button>
             <!-- Dark Mode Button -->
-            <button id="set-dark-mode-btn" class="p-2 rounded-full transition-all duration-200 text-gray-700 hover:text-pink-600 dark:text-gray-300 dark:hover:text-pink-400" aria-label="Set dark mode">
+            <button id="set-dark-mode-btn" class="p-2 rounded-full transition-all duration-200 text-gray-700 hover:text-pink-600 dark:text-gray-300 dark:hover:text-pink-400 ring-offset-white dark:ring-offset-gray-800" aria-label="Set dark mode">
                 <i data-lucide="moon" class="w-6 h-6"></i>
             </button>
             <!-- Mini Cart Button -->
